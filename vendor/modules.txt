@@ -1,0 +1,14 @@
+# github.com/go-sql-driver/mysql v1.4.1
+github.com/go-sql-driver/mysql
+# github.com/golang-migrate/migrate v3.5.4+incompatible
+github.com/golang-migrate/migrate
+github.com/golang-migrate/migrate/database
+github.com/golang-migrate/migrate/database/mysql
+github.com/golang-migrate/migrate/source
+github.com/golang-migrate/migrate/source/file
+# github.com/gorilla/context v1.1.1
+github.com/gorilla/context
+# github.com/gorilla/mux v1.7.3
+github.com/gorilla/mux
+# google.golang.org/appengine v1.6.5
+google.golang.org/appengine/cloudsql
