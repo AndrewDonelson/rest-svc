@@ -9,8 +9,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//var Log *golog.Logger
-
 func main() {
 	golog.Log.Options = golog.Options{Module: "rest-svc", Environment: golog.EnvDevelopment, SmartError: true}
 
