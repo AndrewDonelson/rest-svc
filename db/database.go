@@ -51,9 +51,7 @@ func migrateDatabase(db *sql.DB) error {
 		return err
 	}
 
-	migration.Log = &MigrationLogger{}
-
-	migration.Log.Printf("Applying database migrations")
+	golog.Log.Printf("Applying database migrations")
 	err = migration.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		return err
@@ -64,7 +62,7 @@ func migrateDatabase(db *sql.DB) error {
 		return err
 	}
 
-	migration.Log.Printf("Active database version: %d", version)
+	golog.Log.Printf("Active database version: %d", version)
 
 	return nil
 }

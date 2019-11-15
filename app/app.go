@@ -32,11 +32,13 @@ type ServerApp interface {
 	Shutdown()
 }
 
+// App is the main application object and must implement all methods of ServerApp
 type App struct {
 	Router   *mux.Router
 	Database *sql.DB
 }
 
+// InitRouter called by Startup to initialize all routes handled by app
 func (app *App) InitRouter() {
 	golog.Log.Info("Initializing router")
 	app.Router.
@@ -55,13 +57,18 @@ func (app *App) InitRouter() {
 		HandlerFunc(app.handlerPostFunction)
 }
 
+// InitRouter called by Startup to initialize all routes handled by app
 func (app *App) InitDatabase() (err error) {
 	app.Database, err = db.CreateDatabase()
 	if err != nil {
 		golog.Log.Warningf("Database connection failed: %s", err.Error())
 		golog.Log.Info("Database access will be disabled")
 	}
+
+	return
 }
+
+// Router Handler Functions (local)
 
 func (app *App) handlerIndexFunction(w http.ResponseWriter, r *http.Request) {
 	golog.Log.HandlerLog(w, r)
