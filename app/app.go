@@ -57,7 +57,7 @@ func (app *App) InitRouter() {
 		HandlerFunc(app.handlerPostFunction)
 }
 
-// InitRouter called by Startup to initialize all routes handled by app
+// InitDatabase called by Startup to initialize the apps database (if any)
 func (app *App) InitDatabase() (err error) {
 	app.Database, err = db.CreateDatabase()
 	if err != nil {

@@ -6,12 +6,15 @@ import (
 	"os"
 
 	"github.com/AndrewDonelson/golog"
+	// Blank Import
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/mysql"
+	// Blank Import
 	_ "github.com/golang-migrate/migrate/source/file"
 )
 
+// CreateDatabase Creates a new MySQL Database
 func CreateDatabase() (*sql.DB, error) {
 	serverName := "localhost:3306"
 	user := "myuser"
