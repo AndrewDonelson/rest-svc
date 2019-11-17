@@ -11,7 +11,7 @@ import (
 )
 
 // ServerApp defines the reguired functions that need to be implemented
-type ServerApp interface {
+type ServerAppInterface interface {
 	// Startup calls Init* methods and displays standard app header
 	Startup()
 	// InitEnvironment called by Startup to intiialize apps environment variables
@@ -32,14 +32,54 @@ type ServerApp interface {
 	Shutdown()
 }
 
+type ServerAppState int
+
+const (
+	AppStateUnknown      ServerAppState = 0
+	AppStateInitializing ServerAppState = 1
+	AppStateInitialized  ServerAppState = 2
+	AppStateOnline       ServerAppState = 3
+	AppStateOffline      ServerAppState = 4
+	AppStateShuttingDown ServerAppState = 5
+	AppStateShutdown     ServerAppState = 6
+	AppStateExiting      ServerAppState = 7
+)
+
+type RouterShutdownFunc func(r *mux.Router)
+type DatabaseShutdownFunc func(d *sql.DB)
+type NetworkShutdownFunc func(hostaddresses []string)
+type AppShutdownFunc func(notifyEmail string)
+
+type ShutdownMethods interface {
+	NiceRouterShudown(r *mux.Router)
+	NiceDatbaseShutdown(d *sql.DB)
+	NiceNetworkShutdown(hostaddresses []string)
+	NiceAppShutdown(notifyEmail string)
+}
+
+type ShutdownFuncs struct {
+	RouterFunc  RouterShutdownFunc
+	Database    DatabaseShutdownFunc
+	Network     NetworkShutdownFunc
+	Application AppShutdownFunc
+}
+
 // App is the main application object and must implement all methods of ServerApp
-type App struct {
-	Router   *mux.Router
-	Database *sql.DB
+type ServerApp struct {
+	state         ServerAppState
+	Router        *mux.Router
+	Database      *sql.DB
+	ShutdownFuncs ShutdownFuncs
+}
+
+var Svr *ServerApp
+
+func init() {
+	Svr = new(ServerApp)
 }
 
 // InitRouter called by Startup to initialize all routes handled by app
-func (app *App) InitRouter() {
+func (app *ServerApp) InitRouter() {
 	golog.Log.Info("Initializing router")
 	app.Router.
 		Methods("GET").
@@ -58,7 +98,7 @@ func (app *App) InitRouter() {
 }
 
 // InitDatabase called by Startup to initialize the apps database (if any)
-func (app *App) InitDatabase() (err error) {
+func (app *ServerApp) InitDatabase() (err error) {
 	app.Database, err = db.CreateDatabase()
 	if err != nil {
 		golog.Log.Warningf("Database connection failed: %s", err.Error())
@@ -70,12 +110,12 @@ func (app *App) InitDatabase() (err error) {
 
 // Router Handler Functions (local)
 
-func (app *App) handlerIndexFunction(w http.ResponseWriter, r *http.Request) {
+func (app *ServerApp) handlerIndexFunction(w http.ResponseWriter, r *http.Request) {
 	golog.Log.HandlerLog(w, r)
 
 }
 
-func (app *App) handlerGetFunction(w http.ResponseWriter, r *http.Request) {
+func (app *ServerApp) handlerGetFunction(w http.ResponseWriter, r *http.Request) {
 	golog.Log.HandlerLog(w, r)
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
@@ -98,7 +138,7 @@ func (app *App) handlerGetFunction(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *App) handlerPostFunction(w http.ResponseWriter, r *http.Request) {
+func (app *ServerApp) handlerPostFunction(w http.ResponseWriter, r *http.Request) {
 	golog.Log.HandlerLog(w, r)
 	if app.Database != nil {
 		_, err := app.Database.Exec("INSERT INTO `test` (name) VALUES ('myname')")

@@ -1,31 +1,31 @@
 package main
 
 import (
-	"net/http"
+	"fmt"
 
 	"github.com/AndrewDonelson/golog"
-	"github.com/AndrewDonelson/rest-svc/app"
-	"github.com/AndrewDonelson/rest-svc/db"
-	"github.com/gorilla/mux"
+	"github.com/AndrewDonelson/rest-svr/app"
 )
 
 func main() {
 	golog.Log.Options = golog.Options{Module: "rest-svc", Environment: golog.EnvDevelopment, SmartError: true}
 
-	database, err := db.CreateDatabase()
-	if err != nil {
-		golog.Log.Warningf("Database connection failed: %s", err.Error())
-		golog.Log.Info("Database access will be disabled")
-	}
+	fmt.Printf("ServerApp: %v\n", app.Svr)
 
-	app := &app.App{
-		Router:   mux.NewRouter().StrictSlash(true),
-		Database: database,
-	}
+	// database, err := db.CreateDatabase()
+	// if err != nil {
+	// 	golog.Log.Warningf("Database connection failed: %s", err.Error())
+	// 	golog.Log.Info("Database access will be disabled")
+	// }
 
-	app.InitRouter()
+	// app := &app.App{
+	// 	Router:   mux.NewRouter().StrictSlash(true),
+	// 	Database: database,
+	// }
 
-	golog.Log.Info("Listening on port 8080")
-	err = http.ListenAndServe(":8080", app.Router)
-	golog.Log.Fatal(err.Error())
+	// app.InitRouter()
+
+	// golog.Log.Info("Listening on port 8080")
+	// err = http.ListenAndServe(":8080", app.Router)
+	// golog.Log.Fatal(err.Error())
 }
