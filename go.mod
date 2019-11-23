@@ -3,7 +3,7 @@ module github.com/AndrewDonelson/rest-svc
 go 1.13
 
 require (
-	github.com/AndrewDonelson/golog v0.0.0-20191110210651-c1545b675554
+	github.com/AndrewDonelson/golog v0.0.0-20191123032457-cf6e36972260
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1 // indirect

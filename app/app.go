@@ -3,6 +3,7 @@ package app
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/AndrewDonelson/golog"
@@ -64,9 +65,15 @@ type ShutdownFuncs struct {
 	Application AppShutdownFunc
 }
 
+type ServerConfig struct {
+	Name    string
+	Version string
+}
+
 // App is the main application object and must implement all methods of ServerApp
 type ServerApp struct {
 	state         ServerAppState
+	config        ServerConfig
 	Router        *mux.Router
 	Database      *sql.DB
 	ShutdownFuncs ShutdownFuncs
@@ -75,12 +82,18 @@ type ServerApp struct {
 var Svr *ServerApp
 
 func init() {
+
 	Svr = new(ServerApp)
+	Svr.config = ServerConfig{Name: "rest-svc", Version: "1.0.0"}
+	golog.Log.Options = golog.Options{Module: Svr.config.Name, Environment: golog.EnvDevelopment, SmartError: true}
+	golog.Log.Info("ServerApp Initialized")
+
 }
 
 // InitRouter called by Startup to initialize all routes handled by app
 func (app *ServerApp) InitRouter() {
 	golog.Log.Info("Initializing router")
+	app.Router = mux.NewRouter().StrictSlash(true)
 	app.Router.
 		Methods("GET").
 		Path("/").
@@ -98,21 +111,21 @@ func (app *ServerApp) InitRouter() {
 }
 
 // InitDatabase called by Startup to initialize the apps database (if any)
-func (app *ServerApp) InitDatabase() (err error) {
+func (app *ServerApp) InitDatabase() {
+	var err error
 	app.Database, err = db.CreateDatabase()
 	if err != nil {
 		golog.Log.Warningf("Database connection failed: %s", err.Error())
 		golog.Log.Info("Database access will be disabled")
 	}
-
-	return
 }
 
 // Router Handler Functions (local)
 
 func (app *ServerApp) handlerIndexFunction(w http.ResponseWriter, r *http.Request) {
 	golog.Log.HandlerLog(w, r)
-
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "%s v%s", app.config.Name, app.config.Version)
 }
 
 func (app *ServerApp) handlerGetFunction(w http.ResponseWriter, r *http.Request) {
@@ -148,4 +161,16 @@ func (app *ServerApp) handlerPostFunction(w http.ResponseWriter, r *http.Request
 	}
 	golog.Log.Notice("You called a thing!")
 	w.WriteHeader(http.StatusOK)
+}
+
+func (app *ServerApp) Main() {
+	var err error
+
+	app.InitDatabase()
+	app.InitRouter()
+
+	golog.Log.Info("Listening on port 8080")
+	err = http.ListenAndServe(":8080", app.Router)
+	golog.Log.Fatal(err.Error())
+
 }
