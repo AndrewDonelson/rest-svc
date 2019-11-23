@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "${fileDirname}",
-            "env": {},
+            "env": {"BUILD_ENV":"dev"},
             "args": []
         }
     ]

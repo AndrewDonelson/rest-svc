@@ -85,7 +85,7 @@ func init() {
 
 	Svr = new(ServerApp)
 	Svr.config = ServerConfig{Name: "rest-svc", Version: "1.0.0"}
-	golog.Log.Options = golog.Options{Module: Svr.config.Name, Environment: golog.EnvDevelopment, SmartError: true}
+	golog.Log.Options = golog.Options{Module: Svr.config.Name}
 	golog.Log.Info("ServerApp Initialized")
 
 }
